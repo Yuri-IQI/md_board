@@ -1,0 +1,28 @@
+{#if notes.isEmpty()}
+    <p style="color: #333; font-size: 0.85rem; padding: 0.5rem; text-align: center;">
+        Ninguém está escrevendo...
+    </p>
+{#else}
+    {#for note in notes}
+        <div
+                hx-get="/editor/{currentUsername}/view/{note.username}"
+                hx-target="#panel-editor"
+                hx-swap="outerHTML"
+                title="Ver nota de {note.username}"
+                style="
+            background: #0f0f13;
+            border: 1px solid #2a2a3a;
+            border-radius: 6px;
+            padding: 0.6rem 0.8rem;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+        "
+                onmouseover="this.style.background='#1e1e2e'; this.style.borderColor='#6366f1';"
+                onmouseout="this.style.background='#0f0f13'; this.style.borderColor='#2a2a3a';"
+        >
+            <div style="font-size: 0.75rem; font-weight: 600; color: #818cf8; margin-bottom: 0.3rem;">
+                {note.username}
+            </div>
+        </div>
+    {/for}
+{/if}

@@ -1,0 +1,44 @@
+<div id="preview" hx-swap-oob="innerHTML">
+    {renderedHtml.raw}
+</div>
+
+<div id="panel-editor" class="panel active">
+    <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <span>Nota <span style="color: #818cf8;">{noteUsername}</span></span>
+        <button
+                hx-get="/editor/{currentUsername}/own"
+                hx-target="#panel-editor"
+                hx-swap="outerHTML"
+                style="
+                background: #2a2a3a;
+                color: #a5b4fc;
+                border: none;
+                border-radius: 4px;
+                padding: 0.2rem 0.7rem;
+                font-size: 0.75rem;
+                cursor: pointer;
+                transition: background 0.15s, color 0.15s;
+            "
+                onmouseover="this.style.background='#6366f1'; this.style.color='white';"
+                onmouseout="this.style.background='#2a2a3a'; this.style.color='#a5b4fc';"
+        >
+            Voltar
+        </button>
+    </div>
+    <textarea
+            style="
+            flex: 1;
+            border: none;
+            outline: none;
+            resize: none;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            background: #1a1a24;
+            color: #555;
+            caret-color: transparent;
+        "
+            readonly
+    >{markdown}</textarea>
+</div>

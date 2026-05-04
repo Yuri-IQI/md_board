@@ -1,0 +1,18 @@
+services:
+  app:
+    image: markdown-board:latest
+    build:
+      context: .
+      dockerfile: src/main/docker/Dockerfile.jvm
+    ports:
+      - "8080:8080"
+    environment:
+      QUARKUS_DATASOURCE_DB_KIND: h2
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:h2:mem:notesdb;DB_CLOSE_DELAY=-1
+      QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: update
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/q/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s

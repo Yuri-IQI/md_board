@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quadro de Notas — {username}</title>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: sans-serif;
+            background: #0f0f13;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            color: #e2e2f0;
+        }
+
+        header {
+            background: #1a1a24;
+            border-bottom: 1px solid #2a2a3a;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        header h1 { font-size: 1rem; font-weight: 600; color: #e2e2f0; }
+        header span { font-size: 0.85rem; color: #666; }
+        header strong { color: #b9bdf6; }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr 260px;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .panel {
+            background: #1a1a24;
+            border: 1px solid #2a2a3a;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .panel-header {
+            padding: 0.55rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #aaaaaa;
+            border-bottom: 1px solid #2a2a3a;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            flex-shrink: 0;
+        }
+
+        textarea {
+            flex: 1;
+            border: none;
+            outline: none;
+            resize: none;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            background: #1a1a24;
+            color: #c9d1d9;
+            caret-color: #818cf8;
+            min-height: 0;
+        }
+
+        textarea::placeholder { color: #333; }
+
+        .preview {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            line-height: 1.7;
+            font-size: 0.95rem;
+            color: #c9d1d9;
+            min-height: 0;
+        }
+
+        .preview h1, .preview h2, .preview h3 { margin: 0.8rem 0 0.4rem; color: #e2e2f0; }
+        .preview p   { margin-bottom: 0.6rem; }
+        .preview a   { color: #818cf8; }
+        .preview code {
+            background: #0f0f13;
+            color: #a5b4fc;
+            padding: 0.1em 0.35em;
+            border-radius: 3px;
+            font-size: 0.88em;
+        }
+        .preview pre {
+            background: #0f0f13;
+            border: 1px solid #2a2a3a;
+            padding: 0.8rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin-bottom: 0.6rem;
+        }
+        .preview pre code { background: transparent; padding: 0; }
+        .preview blockquote {
+            border-left: 3px solid #6366f1;
+            padding-left: 0.8rem;
+            color: #666;
+            margin-bottom: 0.6rem;
+        }
+        .preview hr { border: none; border-top: 1px solid #2a2a3a; margin: 0.8rem 0; }
+
+        .sidebar { overflow-y: auto; }
+        .sidebar-content {
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 4px; }
+
+        .tab-bar { display: none; }
+
+        @media (max-width: 700px) {
+            .workspace {
+                display: flex;
+                flex-direction: column;
+                padding: 0;
+                gap: 0;
+                overflow: hidden;
+            }
+
+            .panel {
+                display: none;
+                flex: 1;
+                border-radius: 0;
+                border: none;
+                border-top: 1px solid #2a2a3a;
+            }
+
+            .panel.active {
+                display: flex;
+            }
+
+            textarea {
+                font-size: 1rem;
+                padding: 0.85rem;
+                font-size: max(1rem, 16px);
+            }
+
+            .preview {
+                font-size: 1rem;
+                padding: 0.85rem;
+            }
+
+            .tab-bar {
+                display: flex;
+                background: #1a1a24;
+                border-top: 1px solid #2a2a3a;
+                flex-shrink: 0;
+            }
+
+            .tab-bar button {
+                flex: 1;
+                padding: 0.75rem 0.5rem;
+                background: transparent;
+                border: none;
+                color: #555;
+                font-size: 0.75rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                cursor: pointer;
+                border-top: 2px solid transparent;
+                transition: color 0.15s, border-color 0.15s;
+            }
+
+            .tab-bar button.active {
+                color: #818cf8;
+                border-top-color: #6366f1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Markdown Board</h1>
+    <span>escrevendo em <strong>{username}</strong></span>
+</header>
+
+<div class="workspace">
+
+    <div id="panel-editor" class="panel active">
+        <div class="panel-header">Editor</div>
+        <textarea
+                id="editor-textarea"
+                name="markdown"
+                placeholder="Escreva seu Markdown aqui..."
+                hx-post="/editor/{username}/save"
+                hx-trigger="keyup changed delay:1s"
+                hx-include="this"
+                hx-swap="none"
+                hx-on::after-request="htmx.trigger('#feed-content', 'feedRefresh')"
+        >{markdown}</textarea>
+    </div>
+
+    <div id="panel-preview" class="panel">
+        <div class="panel-header">Preview</div>
+        <div class="preview"
+             id="preview"
+             hx-post="/editor/{username}/preview"
+             hx-trigger="keyup from:#editor-textarea delay:500ms"
+             hx-include="#editor-textarea"
+             hx-swap="innerHTML">
+            {renderedHtml.raw}
+        </div>
+    </div>
+
+    <div id="panel-feed" class="panel sidebar">
+        <div class="panel-header">Outras Notas</div>
+        <div id="feed-content"
+             class="sidebar-content"
+             hx-get="/editor/{username}/feed"
+             hx-trigger="every 3s, feedRefresh"
+             hx-swap="innerHTML">
+        </div>
+    </div>
+
+</div>
+
+<nav class="tab-bar">
+    <button id="tab-editor" class="active" onclick="switchTab('editor')">Editor</button>
+    <button id="tab-preview" onclick="switchTab('preview')">Preview</button>
+    <button id="tab-feed" onclick="switchTab('feed')">Notas</button>
+</nav>
+
+<script>
+    function switchTab(name) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-bar button').forEach(b => b.classList.remove('active'));
+        document.getElementById('panel-' + name).classList.add('active');
+        document.getElementById('tab-' + name).classList.add('active');
+    }
+</script>
+
+</body>
+</html>

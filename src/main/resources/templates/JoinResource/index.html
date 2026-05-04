@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Markdown Board</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: sans-serif;
+            background: #0f0f13;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: #1a1a24;
+            padding: 2rem;
+            border-radius: 10px;
+            border: 1px solid #2a2a3a;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+            color: #e2e2f0;
+        }
+
+        p {
+            color: #888;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.65rem 1rem;
+            background: #0f0f13;
+            border: 1px solid #2a2a3a;
+            border-radius: 6px;
+            font-size: 1rem;
+            color: #e2e2f0;
+            margin-bottom: 1rem;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #6366f1;
+        }
+
+        input::placeholder { color: #444; }
+
+        button {
+            width: 100%;
+            padding: 0.7rem;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        button:hover { background: #4f46e5; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>Notas em Markdown</h1>
+    <p>Dê um nome a sua nota</p>
+    <form action="/join" method="post">
+        <input type="text"
+               name="username"
+               placeholder="Nome"
+               required
+               autofocus />
+        <button type="submit">Entre →</button>
+    </form>
+</div>
+</body>
+</html>
